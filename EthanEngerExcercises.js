@@ -1,7 +1,7 @@
 //requirement 1
 document.addEventListener("load", ()=>    //Make sure to not block loading or rendering of page
 {
-    let scripts = document.querySelectorAll("script"); //make sure the lodash script wasn't already 
+    let scripts = document.querySelectorAll("script"); //make sure the lodash script wasn't already implimented
     let loaded = false;
     scripts.forEach(element => {
         if(element.getAttribute("src") == "lodash.js")
@@ -31,11 +31,6 @@ let jumpid = "test";
 
 
 //Requirement 3
-if(localStorage.getItem("click_activity") == null)
-{
-    const defaultClickArray = []
-    localStorage.setItem("click_activity", JSON.stringify(defaultClickArray));
-}
 document.addEventListener("click", (e)=>{
      let clickArray = localStorage.getItem("click_activity") != null ? JSON.parse(localStorage.getItem("click_activity")) : [];
      let log = e.target.tagName.toLower(); //add tag
