@@ -34,14 +34,11 @@ function reduceUrls()
 
 //Requirement 2
 function StoreJumpId() {
-    if(digitalData.page.pageInfo === undefined)
+    while(digitalData.page.pageInfo === undefined)
     {
         setTimeout(StoreJumpId, 100)
     }
-    else
-    {
-        digitalData.page.pageInfo.jumpid = ParseJumpIdFromURL(document.URL); //Should be available when dom is loaded. Hopefully
-    };
+    digitalData.page.pageInfo.jumpid = ParseJumpIdFromString(document.URL); //Should be available when dom is loaded. Hopefully
 }
 
 function ParseJumpIdFromString(string)
@@ -59,9 +56,9 @@ function MakeElementClickStorage() {
 
 function AddClickActivity(e)
 {
-    let clickArray = localStorage.getItem("click_activity") !== null ? JSON.parse(localStorage.getItem("click_activity")) : [];
+    let clickArray = localStorage.getItem("click_activity") === null ? [] : JSON.parse(localStorage.getItem("click_activity"));
     clickArray.push(StringifyElement(e));
-    localStorage.setItem("click_activity", clickArray);
+    localStorage.setItem("click_activity", JSON.stringify(clickArray));
 }
 
 function StringifyElement(e)
