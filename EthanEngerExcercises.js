@@ -15,12 +15,21 @@ document.addEventListener("load", () =>    //Make sure to not block loading or r
         let cdnHostedLodash = document.createElement("script");
         lodashScript.setAttribute("src", "lodash.js");
         cdnHostedLodash.setAttribute("src", "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js");
+        cdnHostedLodash.setAttribute("integrity", "sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==")
+        cdnHostedLodash.setAttribute("onload", reduceUrls)
         headElement.appendChild(lodashScript);
         headElement.appendChild(cdnHostedLodash);
         //make it do the hash requirement
     }
-    return document.querySelector("a").reduce();
 });
+
+function reduceUrls()
+{
+    console.log( _.reduce(document.querySelectorAll("a"), (urls, tag) => {
+        urls.push(tag.getAttribute("href"));
+         return urls;
+    }, []));
+}
 
 
 //Requirement 2
@@ -42,7 +51,7 @@ function ParseJumpIdFromString(string)
 }
 
 //Requirement 3
-function MakeElementClickStoreage() {
+function MakeElementClickStorage() {
     document.addEventListener("click", (e) => {
         AddClickActivity(e.target)
     });
