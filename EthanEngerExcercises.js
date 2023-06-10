@@ -14,7 +14,7 @@ document.addEventListener("load", () =>    //Make sure to not block loading or r
         let lodashScript = document.createElement("script");
         let cdnHostedLodash = document.createElement("script");
         lodashScript.setAttribute("src", "lodash.js");
-        cdnHostedScript.setAttribute("src", "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js");
+        cdnHostedLodash.setAttribute("src", "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js");
         headElement.appendChild(lodashScript);
         headElement.appendChild(cdnHostedLodash);
         //make it do the hash requirement
@@ -24,16 +24,21 @@ document.addEventListener("load", () =>    //Make sure to not block loading or r
 
 
 //Requirement 2
-function ReadJumpIdThenStoreThisSpinLocks() {
-    document.addEventListener("DOMContentLoaded", () =>
+function StoreJumpId() {
+    if(digitalData.page.pageInfo === undefined)
     {
-        let url = document.URL
-        //let regex = new RegExp("/jumpid=[a-zA-Z0-9+_[a-zA-Z0-9]]") //I couldn't figure out the regex.
-        //lets figure t out
-        let jumpid = url.split("jumpid=")[1].split("#")[0];
-        //while (digitalData.page.pageInfo.jumpid == undefined) { }//I am so sorry for my spin lock 
-        digitalData.page.pageInfo.jumpid = jumpid; //Should be available when dom is loaded. Hopefully
-    });
+        setTimeout(StoreJumpId, 100)
+    }
+    else
+    {
+        digitalData.page.pageInfo.jumpid = ParseJumpIdFromURL(document.URL); //Should be available when dom is loaded. Hopefully
+    };
+}
+
+function ParseJumpIdFromString(string)
+{
+    const jumpidRegex = /(?<=jumpid\=)[a-z]{2}_[\w]+/
+    return string.match(jumpidRegex);
 }
 
 //Requirement 3
@@ -46,27 +51,58 @@ function MakeElementClickStoreage() {
 function AddClickActivity(e)
 {
     let clickArray = localStorage.getItem("click_activity") !== null ? JSON.parse(localStorage.getItem("click_activity")) : [];
-    let log = e.tagName.toLowerCase(); //add tag
-    log += ":" + e.getAttribute("id"); //add attribute
-    let classes = e.getAttribute("class").replace(" ", "."); //make classes into correct format
-    log += ":" + classes;
-    log += ":" + e.getAttribute("name");
-    clickArray.push(log);
+    clickArray.push(StringifyElement(e));
     localStorage.setItem("click_activity", clickArray);
+}
+
+function StringifyElement(e)
+{
+    let log = e.tagName.toLowerCase(); //add tag
+    if(e.getAttribute("id") != null)
+    {
+        log += ":" + e.getAttribute("id"); //add attribute
+    }
+    if(e.getAttribute("class") != null)
+    {
+        let classes = e.getAttribute("class").replaceAll(" ", "."); //make classes into correct format
+        log += ":" + classes;
+    }
+    if(e.getAttribute("name") != null)
+    {
+      log += ":" + e.getAttribute("name");
+    }
+    return log;
 }
 
 //Requirement 4
 //Figure out test cases dummy
-//lets try mocha
-var assert = require('mocha');
-describe('Click Activity', () => {
-    describe('AddClickActivity()', () =>
-    {
+//These worked in a js project but it is supposed to be a single file
+describe('Stringify elements')
+{
+    test('element to string test', () => {
         let exampleElement = document.createElement("a")
         exampleElement.setAttribute("id", "matt1");
         exampleElement.setAttribute("class", "link button fixture");
         exampleElement.setAttribute("name", "matt");
-        AddClickActivity(exampleElement);
-        assert.equal(JSON.parse(localStorage.getItem("click_activity")[0], "a:matt1:link.button.fixture:matt"))
+        expect(StringifyElement(exampleElement)).toBe('a:matt1:link.button.fixture:matt');
     });
-});
+    
+    test('null attributes test', () => {
+        let exampleElement = document.createElement("a")
+        expect(StringifyElement(exampleElement)).toBe("a");
+    });
+}
+
+describe('Test the JumpID regex')
+{
+    test('Try out a valid string', () =>
+    {
+        let testString = "HPE.com/blah-blah?jumpid=bm_u7tkh3";
+        expect(ParseJumpIdFromString(testString)).toBe("bm_u7tkh3");
+    });
+
+    test('Try out a non-valid string', () =>{
+        let testString = "Not a valid jumpid="
+        expect(ParseJumpIdFromString(testString)).toBe(null);
+    });
+}
