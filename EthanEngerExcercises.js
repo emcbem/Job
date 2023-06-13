@@ -43,8 +43,15 @@ function StoreJumpId() {
 
 function ParseJumpIdFromString(string)
 {
-    const jumpidRegex = /(?<=jumpid\=)[a-z]{2}_[\w]+/
-    return string.match(jumpidRegex);
+    const jumpidRegex = /(?<=jumpid\=)[a-z]{2}_[\w]+/;
+    try
+    {
+        return string.match(jumpidRegex)[0];
+    }
+    catch
+    {
+        return null;
+    }
 }
 
 //Requirement 3
@@ -80,35 +87,4 @@ function StringifyElement(e)
     return log;
 }
 
-//Requirement 4
-//Figure out test cases dummy
-//These worked in a js project but it is supposed to be a single file
-describe('Stringify elements')
-{
-    test('element to string test', () => {
-        let exampleElement = document.createElement("a")
-        exampleElement.setAttribute("id", "matt1");
-        exampleElement.setAttribute("class", "link button fixture");
-        exampleElement.setAttribute("name", "matt");
-        expect(StringifyElement(exampleElement)).toBe('a:matt1:link.button.fixture:matt');
-    });
-    
-    test('null attributes test', () => {
-        let exampleElement = document.createElement("a")
-        expect(StringifyElement(exampleElement)).toBe("a");
-    });
-}
-
-describe('Test the JumpID regex')
-{
-    test('Try out a valid string', () =>
-    {
-        let testString = "HPE.com/blah-blah?jumpid=bm_u7tkh3";
-        expect(ParseJumpIdFromString(testString)).toBe("bm_u7tkh3");
-    });
-
-    test('Try out a non-valid string', () =>{
-        let testString = "Not a valid jumpid="
-        expect(ParseJumpIdFromString(testString)).toBe(null);
-    });
-}
+module.exports  = {StringifyElement, ParseJumpIdFromString};
